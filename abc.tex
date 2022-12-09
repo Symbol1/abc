@@ -1,0 +1,1076 @@
+% !TEX encoding = UTF-8 Unicode
+% !TEX program = lualatex
+
+\catcode`激13 \def激#1{\lccode`~`#1\lowercase{\catcode`#113\def~}}
+\makeatletter
+
+\documentclass[12pt, aspectratio=1610]{beamer}
+	\advance\parskip\fill
+	\setbeamertemplate{navigation symbols}{}
+	\setbeamersize{text margin left=3mm,text margin right=3mm}
+	\setbeamercolor{normal text}{bg=white,fg=black}
+	\setbeamercolor{structure}{fg=blue!80!red!70!black}
+	\setbeamercolor{alerted text}{fg=red!80!green!70!black}
+	\setbeamercolor{example text}{fg=green!80!blue!70!black}
+	\setbeamercovered{still covered={
+		\opaqueness<1>{15}
+		\opaqueness<2>{10}
+		\opaqueness<3>{5}
+		\opaqueness<4->{0}
+	}}
+
+\usepackage{mathtools, fontspec, unicode-math, emoji}
+	\setmainfont{DejaVuSans}
+	\setsansfont{DejaVuSans}
+	\setmonofont{DejaVuSans}
+	\setemojifont{Apple Color Emoji}
+	\setmathfont{texgyrepagella-math.otf}
+	\setoperatorfont\symrm
+	激㏒{\log} 激㏑{\ln} 激√{\sqrt} 激÷{\dfrac}
+	\DeclareMathOperator\Er{E_\mathrm r}
+	\DeclareMathOperator\poly{poly}
+	\DeclareMathOperator\GF{GF}
+
+\usepackage{tikz, pgfplotstable, booktabs}
+	\usetikzlibrary{arrows.meta}
+	\pgfmathdeclarefunction*{axis_height}0
+		{\begingroup\pgfmathreturn.25em\endgroup}
+	\pgfmathdeclarefunction*{rule_thickness}0
+		{\begingroup\pgfmathreturn.06em\endgroup}
+	\tikzset{
+		every picture/.style={cap=round,join=round,line width=rule_thickness},
+		alt/.code args={<#1>#2#3}{\alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}}},
+		uncover/.style={alt=<#1>{}{opacity=.15}},%tex.stackexchange.com/q/146908
+	}
+	\pgfplotsset{compat/show suggested version=false,compat=1.17}%arxiv=1.17
+
+\title{On Asymptotic Behavior of
+       Sums of Random Variables,
+       Codes, and
+       Structured Codes}
+
+\author{Hsin-Po Wang}
+
+\institute{University of California, Berkeley}
+
+\date{2022-12-09}
+
+\begin{document}
+
+\makeatletter
+\def\linkfil#1{\vbox to#1cm{\hbox{|}\vfil\hbox to3mm{\hfil|}}}
+\defbeamertemplate*{sidebar left}{thinbold}{
+	\pgfsetfillopacity0
+	\hyperlinkframeendprev{\linkfil1}
+	\vfil
+	\hyperlinkslideprev{\linkfil3}
+	\vfil
+	\hyperlinkslidenext{\linkfil3}
+	\vfil
+	\hyperlinkframestartnext{\linkfil1}
+	\vfilneg
+	\pgfsetfillopacity1
+}
+\makeatother
+
+\begin{frame}
+	\centering
+	\color{structure.fg}
+	On Asymptotic Behavior of \\
+	Sums of Random Variables, Codes, and Structured Codes
+
+	\color{normal text.fg}
+	Hsin-Po Wang (EECS, UC Berkeley)
+
+	02022-12-09
+\end{frame}
+
+
+\setbeamertemplate{background canvas}{\tikz [overlay, shift={(8,-5)}] {
+	\edef\t{\the\numexpr\thepage*10}
+	\draw ({3*1.618*cos(\t)}, {3*sin(1.618*\t)}) node
+		[scale=20, opacity=.02] {\emoji{flying-saucer}};
+}}
+
+\part{A Tale}
+
+\begin{frame}
+	\centering
+	Part \insertromanpartnumber
+	
+	\color{structure.fg}
+	\insertpart
+\end{frame}
+
+\def\Alien{\textcolor{example text.fg}{Alien}}
+\def\Human{\textcolor{alerted text.fg}{Human}}
+
+\begin{frame}
+	One day, some alien visits the Earth.
+	
+	\pause
+
+	\Alien:
+	(very politely) We want to invite you carbon-based life
+	to join Unite Galaxies of Andromeda.
+	But before that happens,
+	we have some questions so we understand each other more.
+
+	\pause
+
+	\Alien:
+	So you call this $A = λ m n f x. m f (n f x)$ addition, right?
+	And you call this $M = λ m n f x. m (n f) x$ multiplication.
+	How fast can you multiply two numbers?
+
+	\pause
+
+	\Human:
+	We use a positional numeral system with base $••••••••••{}$
+	and we can multiply two integers, each with $n$ digits,
+	in $O(n㏒n)$ operations.
+
+	\pause
+
+	\Alien:
+	Not bad.
+	Not bad.
+	The optimal complexity is in fact
+	$n㏒n \div ㏒㏒n × ㏒㏒㏒n \div ⋯$,
+	you see what I mean?
+	But that one is impractical.
+	Let's call it a day.
+\end{frame}
+
+\begin{frame}
+	\Alien:
+	Good morning our beloved \emph{Homo sapiens}.
+	Let's continue where we left off yesterday.
+	
+	\pause
+
+	\Alien:
+	So you know you can arrange numbers in a square array
+	(using drones to show a square array)
+	and you can define an associative but not commutative operation
+	on those arrays, right?
+
+	\pause
+
+	\Human:
+	It must be matrix multiplication you are talking about.
+	Glad you ask because we have done so much about that.
+	In fact, we even use matrix multiplication to build a machine
+	that teaches us how to do matrix multiplication faster.
+	Anyway, we are currently under $ω < 2.4$
+	but struggling with breaking the $2.3$-barrier.
+
+	\pause
+
+	\Alien:
+	Very impressive.
+	We are not allowed to say too much.
+	But group theory is the way to go.
+	Goodnight.
+\end{frame}
+
+\begin{frame}
+	\Alien:
+	What a beautiful day, huh?
+	We are almost done with the standard interview checklist.
+
+	\pause
+
+	\Alien:
+	This is the last question.
+	You know that joining the United Galaxies means we need to
+	communicate and collaborate a lot, right?
+	How are your communication skills?
+
+	\pause
+
+	\Human:
+	Well, well, well, we know there is this thing called shannon limit
+	and we can be quite close, only 0.0045dB ...
+	(signal interrupted for 30 minutes)
+
+	\pause
+
+	\Human:
+	In fact, we know a way to reach shannon limit in $O(n㏒n)$ operations.
+	We call it polar code.
+\end{frame}
+
+\begin{frame}
+	\Alien:
+	Outstanding.
+	But let me remind you, one in a billion and one in a trillion
+	make a huge difference when it comes to fault tolerance.
+	Do you have any idea how fast polar code achieves shannon limit?
+
+	\pause
+
+	\itshape
+	The following are the slides that were presented
+	in the \textup{Talk to the Alien Committee (TACo)}
+	before human answered the last question.
+\end{frame}
+
+\part{A 3x3 Array of Theories}
+
+\setbeamertemplate{background}{
+	\def\1{⚀} \def\2{⚁} \def\3{⚂} \def\4{⚃} \def\5{⚄} \def\6{⚅}
+	\begin{tikzpicture} [overlay, shift={(11, -10)}]
+		\draw plot [domain=-5:5, samples=100] (\x, {exp(1.2 - (\x)^2 / 8)});
+		\foreach \a in {1, 2, 3, 4, 5, 6}{
+			\foreach \b in {1, 2, 3, 4, 5, 6}{
+				\draw ({(\a+\b-7) * .7} ,{min(\a, 7-\b) * .5})
+					node {\csname\a\endcsname\!\csname\b\endcsname};
+			}
+		}
+	\end{tikzpicture}
+}
+
+\begin{frame}
+	\centering
+	Part \insertromanpartnumber
+	
+	\color{structure.fg}
+	\insertpart
+\end{frame}
+
+\begin{frame}
+	Probability theory review. \\
+	Let $S_n ≔ X₁ + X₂ + \dotsb + X_n$.
+	(Mean zero.)
+
+	\pause
+
+	Law of large numbers: $÷{S_n}n ≈ 0$.
+
+	\pause
+
+	Large deviation theory: $÷{S_n}n > δ$
+	exponentially rare: $≈ \exp(-I(δ)n)$.
+
+	\pause
+
+	Central limit theorem: $÷{S_n}{√n} \sim \symrm{Normal} (0, σ)$.
+\end{frame}
+
+\setbeamertemplate{background}{
+	\begin{tikzpicture} [overlay, shift={(8,-5)}]
+		\draw (4, 4) node [scale=3] {\emoji{sun}};
+		\draw (6, 3) node [scale=2] {\emoji{earth-americas}};
+		\draw (5, 2) node [scale=1] {\emoji{full-moon}};
+		\draw (-4, -4) node [scale=4] {\emoji{satellite}};
+	\end{tikzpicture}
+}
+
+\begin{frame}
+	Coding theory. \\
+	Information density: $i(x, y) ≔ ㏒÷{P_{XY}(x, y)}{P_X(y) P_Y(y)}$. \\
+	As a random variable: $i(X, Y)$.
+
+	\pause
+
+	Law of large numbers $⇔$ Shannon's noisy channel coding theory.
+
+	\pause
+
+	Large deviations $⇔$ Gallager's error exponent: decode error $≈\exp(-\Er n)$.
+
+	\pause
+
+	Central limit theorem $⇔$ Polyanskiy--Poor--Verdu's finite blocklength \\
+                              \hfill characterization: gap to capacity $≈ 1/√n$.
+\end{frame}
+
+\setbeamertemplate{background}{}
+
+\begin{frame}
+	\centering
+	\def\arraystretch{1.5}
+	\begin{tabular}{cc}
+		\toprule
+		probability theory    & theory of random codes                 \\
+		\midrule
+		law of large numbers  & Shannon's noisy channel coding thm     \\
+		large deviations      & Gallager's error exponent              \\
+		central limit theorem & PPV's finite blocklength characteriz'n \\
+		\bottomrule
+	\end{tabular}
+\end{frame}
+
+\setbeamertemplate{background}{
+	\begin{tikzpicture} [overlay, shift={(8,-5)}]
+		\draw (4, 4) node [scale=3] {\emoji{tokyo-tower}};
+		\draw (6, 3) node [scale=4] {\emoji{department-store}};
+		\draw (4.5, 2.5) node [scale=2] {\emoji{automobile}};
+		\draw (-5, -4) node [scale=5] {\emoji{mobile-phone}};
+	\end{tikzpicture}
+}
+\def\murange#1#2{\tikz[x=8cm]{
+	\draw [lightgray] (0, 0) -- (1/2, 0);
+	\draw [Parenthesis-Parenthesis] (#1, 0) -- (#2, 0);
+}}
+\def\mupoint#1{\tikz[x=8cm]{
+	\draw [lightgray] (0, 0) -- (1/2, 0);
+	\fill (#1, 0) circle [radius=.1em];
+}}
+
+\begin{frame}
+	Polar code.
+
+	\pause
+
+	Shannon's channel coding thm $⇔$ 2009 Arıkan's channel polarization.
+
+	\pause
+
+	Gallager's error exponent $⇔$ 2009 Arıkan--Telatar's rate of polarization \\
+                                            \hfill (decode error $≈ \exp(-√n)$).
+	
+	\pause
+
+	PPV's finite blocklength $⇔$ 2010's Urbanke's scaling exponent \\
+                                           \hfill  (gap to capacity $n^{-1/4}$).
+	
+	\pause
+
+	\raggedleft
+	\only<+->{History of scaling over BMSC:    \hbox to4cm{$0$ \hfill $1/2$} \\}
+	\only<+->{2015 Guruswami--Xia                           \murange{0}{1/2} \\}
+	\only<+->{2012 Goli--Hassani--Urbanke               \murange{0}{1/3.553} \\}
+	\only<+->{2014 Hassani--Alishahi--Urbanke         \murange{1/6}{1/3.579} \\}
+	\only<+->{2014 Goldin--Burshtein              \murange{1/5.702}{1/3.579} \\}
+	\only<+->{2016 Mondelli--Hassani--Urbanke     \murange{1/4.714}{1/3.579} \\}
+	\only<+->{2022 W.--Lin--Vardy--Gabrys          \murange{1/4.63}{1/3.579} \\}
+\end{frame}
+
+\setbeamertemplate{background}{}
+
+\begin{frame}
+	\centering
+	\def\arraystretch{1.5}
+	\begin{tabular}{ccc}
+		\toprule
+		probability theory    & random code        & polar code           \\
+		\midrule
+		law of large numbers  & ~channel capacity~ & channel polarization \\
+		large deviations      & error exponent     & rate of convergence  \\
+		central limit theorem & finite blocklength & scaling exponent     \\
+		\bottomrule
+	\end{tabular}
+\end{frame}
+
+\begin{frame}
+	\centering
+	\def\arraystretch{1.5}
+	\begin{tabular}{ccc}
+		\toprule
+		probability theory    & random code        & polar code           \\
+		\midrule
+		law of large numbers  & ~channel capacity~ & channel polarization \\
+		large deviations      & $\exp(-I(δ)n)$     & $\exp(-√n)$          \\
+		central limit theorem & $1/√n$             & $n^{-1/4}$           \\
+		\bottomrule
+	\end{tabular}
+\end{frame}
+
+\part{Improve Polar Code}
+
+\setbeamertemplate{background}{
+	\begin{tikzpicture} [overlay, shift={(12, -5)}]
+		\path [save path=\A] (0, 1.5) circle [radius=2] ++(90:2) -- ++(90:2);
+		\path [save path=\B] (2, 2) circle [radius=2] ++(45:2) -- ++(45:2);
+		\path [save path=\C] (1.5, 0) circle [radius=2] ++(0:2) -- ++(0:2);
+		\begin{scope}
+			\fill [use path=\A, white!50!black];
+			\fill [use path=\B, white!50!black];
+			\fill [use path=\C, white!50!black];
+		\end{scope}
+		\begin{scope}
+			\clip [use path=\B];
+			\fill [use path=\A, white!50!black!85!black];
+			\fill [use path=\C, white!50!black!85!black];
+		\end{scope}
+		\begin{scope}
+			\clip [use path=\A];
+			\fill [use path=\C, black];
+		\end{scope}
+		\begin{scope}
+			\clip [use path=\A];
+			\clip [use path=\C];
+			\fill [use path=\B, white!50!black!85!black!85!black];
+		\end{scope}
+		\draw [use path=\A];
+		\draw [use path=\B];
+		\draw [use path=\C];
+	\end{tikzpicture}
+}
+
+\begin{frame}
+	\centering
+	Part \insertromanpartnumber
+	
+	\color{structure.fg}
+	\insertpart
+\end{frame}
+
+\pgfmathdeclarerandomlist{alphabet}{{Α}{Β}{Γ}{Δ}{Ε}{Ζ}{Η}{Θ}{Ι}{Κ}{Λ}{Μ}
+{Ν}{Ξ}{Ο}{Π}{Ρ}{Σ}{Τ}{Υ}{Φ}{Χ}{Ψ}{Ω}{α}{β}{γ}{δ}{ε}{ζ}{η}{θ}{ι}{κ}{λ}{μ}
+{ν}{ξ}{ο}{π}{ρ}{ς}{σ}{τ}{υ}{φ}{χ}{ψ}{ω}{θ}{φ}{π}{Ϝ}{ϝ}{κ}{ρ}{Θ}{ε}}
+\setbeamertemplate{background}{
+	\begin{tikzpicture} [overlay, shift={(8,-5)}]
+		\foreach \x in {2, ..., 7}{
+			\foreach \y in {-4, ..., 4}{
+				\pgfmathrandomitem\X{alphabet}
+				\draw (\x, \y) node [opacity=rnd*.4, green, scale=1+rnd] {$\X$};
+			}
+		}
+	\end{tikzpicture}
+}
+\begin{frame}
+	Improve polar for large deviations / \\
+	error exponent / rate of polarization.
+
+	\pause
+
+	2010 Korada--Sasoglu--Urbanke: \\
+	decode error $≈ \exp(-n^β)$ with any matrix.
+
+	\pause
+
+	2014 Mori--Tanaka: same error $\exp(-n^β)$ \\
+	but for any finite field.
+
+	\pause
+
+	$⇒$ Reed--Solomon kernel (Vandermonde matrix) \\
+	$⇒$ best distance profile.
+\end{frame}
+
+\setbeamertemplate{background}{}
+
+\begin{frame}
+	\centering
+	\def\arraystretch{1.5}
+	\def\A{\color{alerted text.fg}}
+	\begin{tabular}{ccc}
+		\toprule
+		probability theory    & random code        & polar code           \\
+		\midrule
+		law of large numbers  & ~channel capacity~ & channel polarization \\
+		large deviations      & $\exp(-I(δ)n)$     & \A $\exp(-n^{1-ε})$  \\
+		central limit theorem & $1/√n$             & $n^{-1/4}$           \\
+		\bottomrule
+	\end{tabular}
+\end{frame}
+
+\begin{frame}
+	Improve polar code for \\ 
+	central limit theorem / finite blocklength / scaling exponent.
+
+	\pause
+
+	Assume binary erasure channel (the simplest channel). \\
+	Analyze large matrices or large alphabet.
+
+	\pause
+
+	\raggedleft
+	\only<+->{2010 Hassani--Alishahi--Urbanke
+                                          $2 × 2$ \murange{1/3.589}{1/3.627} \\}
+	\only<+->{2010 Korada--Montanari--Telatar--Urbanke
+                                                   $2 × 2$ \mupoint{1/3.627} \\}
+	\only<+->{2014 Fazeli--Vardy                   $8 × 8$ \mupoint{1/3.577} \\}
+	\only<+->{2021 Trofimiuk--Trifonov           $16 × 16$ \mupoint{1/3.346} \\}
+	\only<+->{2022 Duursma--Gabrys--Guruswami--Lin--W.
+                                            $2 × 2 / \GF4$ \mupoint{1/3.328} \\}
+	\only<+->{2021 Trofimiuk                     $24 × 24$ \mupoint{1/3.308} \\}
+	\only<+->{2021 Yao--Fazeli--Vardy            $32 × 32$ \mupoint{1/3.122} \\}
+	\only<+->{2021 Yao--Fazeli--Vardy             $64 × 64$ \mupoint{1/2.87} \\}
+\end{frame}
+
+\begin{frame}
+	\centering
+	\def\arraystretch{1.5}
+	\def\A{\color{alerted text.fg}}
+	\begin{tabular}{ccc}
+		\toprule
+		probability theory    & random code        & polar code           \\
+		\midrule
+		law of large numbers  & ~channel capacity~ & channel polarization \\
+		large deviations      & $\exp(-I(δ)n)$     & \A $\exp(-n^{1-ε})$  \\
+		central limit theorem & $1/√n$             & \A $n^{-1/3}$        \\
+		\bottomrule
+	\end{tabular}
+\end{frame}
+
+\begin{frame}
+	Improve polar code for \\
+	central limit theorem / finite blocklength / scaling exponent. \\
+	But this time, aim for the optimal gap to capacity $n^{-1/2+ε}$.
+
+	\pause
+
+	2019 Pfister--Urbanke: $q$-ary erasure channel, $q → ∞$.
+
+	\pause
+
+	2021 Fazeli--Hassani--Mondelli--Vardy: binary erasure channel.
+
+	\pause
+
+	2022 Guruswami--Riazanov--Ye: binary symmetric memoryless channel.
+
+	\pause
+
+	2021 W.--Duursma: discrete memoryless channel.
+\end{frame}
+
+\begin{frame}
+	\centering
+	\def\arraystretch{1.5}
+	\def\A{\color{alerted text.fg}}
+	\def\E{\color{example text.fg}}
+	\begin{tabular}{ccc}
+		\toprule
+		probability theory    & random code        & polar code           \\
+		\midrule
+		law of large numbers  & ~channel capacity~ & channel polarization \\
+		large deviations      & $\exp(-I(δ)n)$     & \A $\exp(-n^{1-ε})$  \\
+		central limit theorem & $1/√n$             & \E $n^{-1/2+ε}$      \\
+		\bottomrule
+	\end{tabular}
+\end{frame}
+
+\part{Proof Techniques}
+
+\setbeamertemplate{background}{
+	\begin{tikzpicture} [overlay, shift={(8,-5)}]
+		\draw (-5, 3) node [rotate=30]
+		{\fontspec{ComicSansMS} V + F - 2 = m (aa + bb)};
+	\end{tikzpicture}
+}
+
+\begin{frame}
+	\centering
+	Part \insertromanpartnumber
+	
+	\color{structure.fg}
+	\insertpart
+\end{frame}
+
+\setbeamertemplate{background}{}
+
+\begin{frame}
+	Polar code is a technique \\
+	to generate ``child channels'' out of ``parent channel''.
+
+	\begin{tikzpicture} [yscale=0.8]
+		\draw (0, 0) node (A) {physical channel};
+		\draw (5, 3) node (B1) {child channel (1)} (A) -- (B1);
+		\draw (5, 0) node (B2) {child channel (2)} (A) -- (B2);
+		\draw (5, -3) node (B3) {child channel (3)} (A) -- (B3);
+		\draw (10, 4) node (C11) {grandchild (1-1)} (B1) -- (C11);
+		\draw (10, 3) node (C12) {grandchild (1-2)} (B1) -- (C12);
+		\draw (10, 2) node (C13) {grandchild (1-3)} (B1) -- (C13);
+		\draw (10, 1) node (C21) {grandchild (2-1)} (B2) -- (C21);
+		\draw (10, 0) node (C22) {grandchild (2-2)} (B2) -- (C22);
+		\draw (10, -1) node (C23) {grandchild (2-3)} (B2) -- (C23);
+		\draw (10, -2) node (C31) {grandchild (3-1)} (B3) -- (C31);
+		\draw (10, -3) node (C32) {grandchild (3-2)} (B3) -- (C32);
+		\draw (10, -4) node (C33) {grandchild (3-3)} (B3) -- (C33);
+	\end{tikzpicture}
+\end{frame}
+
+\def\recursivetree#1#2{
+	\edef\d{#1}
+	\edef\z{#2}
+	\fill [opacity=(7/8)^\d] (\d, \z/32) circle [radius=.1em];
+	\ifnum \d < \depth
+	\ifdim \z pt > \threshold pt
+	\ifdim \z pt < \holdthres pt
+		\edef\dpp{\the\numexpr\d + 1}
+		{
+			\pgfmathsetmacro\zup{\z * (256-\z) / 128}
+			\draw [opacity=(7/8)^\d] (\d, \z/32) -- (\dpp, \zup/32);
+			\recursivetree{\dpp}{\zup}
+		}
+		{
+			\pgfmathsetmacro\zdown{\z^2 / 128}
+			\draw [opacity=(7/8)^\d] (\d, \z/32) -- (\dpp, \zdown/32);
+			\recursivetree{\dpp}{\zdown}
+		}
+	\fi
+	\fi
+	\fi
+}
+
+\begin{frame}
+	To get a good polar code, the ``descendant channels'' must polarize. \\
+	That is, some descendants must be very good channels, \\
+	others very bad.
+
+	\pause
+
+	It suffices to investigate each ``nuclear family''
+	\scalebox{3}{\emoji{family-woman-girl-girl}}. \\
+	Ask: Are the good children good enough compared to parent? \\
+	\phantom{Ask: Are the } bad \phantom{ children } bad
+\end{frame}
+
+\begin{frame}
+	\hbox{}\hskip5em
+	\begin{tikzpicture} [y=1.5cm]
+		\def\depth{8}
+		\def\threshold{0}
+		\def\holdthres{128}
+		\recursivetree{0}{49}
+		\draw [alerted text.fg] (\depth, 1/4) -- +(1, 0) 
+			node [right] {threshold $θ$};
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+	Now, optimal scaling law $n^{1/2+ε}$, how to? \\
+	Warning: over-simplified but still highly technical.
+
+	\pause
+
+	Let $G$ be a random invertible $ℓ × ℓ$ matrix. \\
+	With high probability, the lower half of $G$ is a good linear code. \\
+	Use Gallager's error exponent argument: decode error $≈ \exp(-\Er ℓ)$. \\
+	$\Er$ is about $(\text{gap to capacity})²$ ---
+	Cramér function is locally parabola. \\
+	The square is the same square as in finite blocklength's $1/√n$.
+
+	\pause
+
+	The other half of the story: \\
+	With high probability,
+	the upper half of $G$ is good against wiretapping. \\
+	Use Hayashi's secrecy exponent argument: info leaked $≈ \exp(-\Er ℓ)$.
+
+	\pause
+
+	\only<+->
+	{Funny 1: we use error exponent bounds to attack finite blocklength.}
+	
+	\only<+->
+	{Funny 2: we use wiretapping results to attack noisy channel coding.}
+\end{frame}
+
+\part{The Trade-off Row}
+
+\setbeamertemplate{background}{
+	\begin{tikzpicture} [overlay, shift={(8, -5)}]
+		\draw (4, -2.2) node [scale=3] {\emoji{red-apple}};
+		\draw (6, -2.2) node [scale=3] {\emoji{orange}};
+		\draw (5, -2) node [scale=9] {\emoji{balance-scale}};
+	\end{tikzpicture}
+}
+
+\begin{frame}
+	\centering
+	Part \insertromanpartnumber
+	
+	\color{structure.fg}
+	\insertpart
+\end{frame}
+\setbeamertemplate{background}{}
+
+\begin{frame}
+	\centering
+	\def\arraystretch{1.5}
+	\begin{tabular}{ccc}
+		\toprule
+		probability theory    & random code        & polar code           \\
+		\midrule
+		law of large numbers  & ~channel capacity~ & channel polarization \\
+		large deviations      & $\exp(-I(δ)n)$     & $\exp(-n^{1-ε})$     \\
+		central limit theorem & $1/√n$             & $n^{-1/2+ε}$         \\
+		moderate deviations   & ???                & ???                  \\
+		\bottomrule
+	\end{tabular}
+\end{frame}
+
+\begin{frame}
+	In probability theory: $÷{S_n}n ≈ n^{-(1-β)/2}$
+	with probability $≈ \exp(-n^β)$.
+
+	\pause
+
+	For random code:
+	gap to capacity $≈ n^{-(1-β)/2}$; decode error $≈ \exp(-n^β)$. \\
+	2014 Altug--Wagner.
+	2010 Polyanskiy--Verdu.
+
+	\pause
+
+	For polar code:
+	gap to capacity $≈ n^{-(1-β)/2+ε}$; decode error $≈ \exp(-n^{β-ε})$.
+	2021 W.--Duursma.
+\end{frame}
+
+\begin{frame}
+	\centering
+	\def\arraystretch{1.5}
+	\begin{tabular}{ccc}
+		\toprule
+		probability theory    & random code        & polar code           \\
+		\midrule
+		law of large numbers  & ~channel capacity~ & channel polarization \\
+		large deviations      & $\exp(-I(δ)n)$     & $\exp(-n^{1-ε})$     \\
+		central limit theorem & $1/√n$             & $n^{-1/2+ε}$         \\
+		moderate deviations   & trade-off          & trade-off up to $ε$  \\
+		\bottomrule
+	\end{tabular}
+\end{frame}
+
+\def\coordpin#1:[#2]{coordinate [pin=#1:{[#2]}] (X)}
+\pgfmathdeclarefunction{g2o}1{\pgfmathparse{1/(5.714-4.714*h2o(#1))}}
+% denominator = mu+1-mu*h2(#1)
+\pgfmathdeclarefunction{h256}1{% := h2(#1/256)
+	\pgfmathsetmacro\comp{256-#1}%
+	\pgfmathparse{(-#1*ln(#1)-\comp*ln(\comp))/177.445678+8}%
+}
+\pgfmathdeclarefunction{h2o}1{% := h2(sin(#1)^2)
+	\pgfmathsetmacro\sin{sin(#1)}\pgfmathsetmacro\cos{cos(#1)}%
+	\ifdim\sin pt=0pt%
+		\pgfmathparse{0}%
+	\else\ifdim\cos pt=0pt%
+		\pgfmathparse{0}%
+	\else%
+		\pgfmathparse{(-\sin*ln(\sin)*\sin-\cos*ln(\cos)*\cos)*2.88539}% 2/ln(2)
+	\fi\fi%
+}
+\makeatletter
+	\tikzset{
+		every pin/.style={anchor=180+\tikz@label@angle,anchor/.code=},
+		dot/.pic={\fill circle(.1em);}
+	}
+\makeatother
+\begin{frame}
+	\centering
+	\begin{tikzpicture} [x=10cm, y=10cm]
+		\draw [->] (0, 0) -- (1.1, 0) node [below] {$β$};
+		\draw [->] (0, 0) -- (0, .55) node [above] {gap exponent};
+		\draw[lightgray]
+			plot [domain=30:55, samples=75] ({sin(\x)^2}, {1-h2o(\x)})
+		;
+		\draw
+			(0, .5) pic{dot} \coordpin 0:[PfU19, FHM21, GRY22, WaD21]
+			(.005, .49) pic{dot} \coordpin 180:[GRY22]
+			(0, 1/2.9) pic{dot} \coordpin 180:[YFV21]
+			(0, 1/3.627) pic{dot} \coordpin 180:[HAU14]
+			(0,.1) pic{dot} \coordpin 180:[BGN18]
+			(0, .5) -- (1, 0) (.6, .2) \coordpin 45:[WaD21]
+			(0, 1/3.627)--node[pos=.3](X){}(.3947,.03223)(X)\coordpin 30:[WaD18]
+			plot [domain=38.922:45,samples=30] ({sin(\x)^2},{1-h2o(\x)})
+			plot[domain=0:45,samples=90]({g2o(\x)*sin(\x)^2},{(1-g2o(\x))/3.627})
+			({g2o(31)*sin(31)^2},{(1-g2o(31))/3.627})\coordpin 240:[MHU16]
+			(.49,.0001) pic{dot} \coordpin 90:[GuX15]
+			(.5,0) pic{dot} \coordpin 270:[ArT09, Sas11, HoY13]
+			(0.98,.005) pic{dot} \coordpin 45:[BGS18]
+			(1,0) pic{dot} \coordpin 270:[KSU10, MoT14];
+		;
+	\end{tikzpicture}
+\end{frame}
+
+\pgfplotstableread{
+	{ }      BEC      BMSC     $p$-ary  $q$-ary  finite   binary   a-finite 
+	LLN      Ari09    Ari09    STA09    STA09    STA09    SRD12    WaD21    
+	LD       ArT09    ArT09    STA09    MoT14    Sas11    HoY13    WaD21    
+	CLT      KMT10    HAU14    BGN18    WaD21    WaD21    WaD21    WaD21    
+	MD       GrX15    GrX15    BGS18    WaD21    WaD21    WaD21    WaD21    
+	LD★      KSU10    KSU10    WaD21    WaD21    WaD21    WaD21    WaD21    
+	CLT★     FHM18    GRY20    WaD21    WaD21    WaD21    WaD21    WaD21    
+	MD★      WaD21    WaD21    WaD21    WaD21    WaD21    WaD21    WaD21    
+}\tableReferences
+
+\begin{frame}
+	\centering
+	\def\arraystretch{1.5}
+	\small
+	\pgfplotstabletypeset[
+		columns/a-finite/.style={column name=finite},
+		every head row/.style={
+			before row=\toprule&\multicolumn5c{Symmetric}
+			&\multicolumn2c{Asymmetric}\\,
+			after row=\midrule
+		},
+		every last row/.style={after row=\bottomrule},
+		string type
+	]\tableReferences
+
+	Un-starred: existence of exponent; starred: optimal exponent.
+\end{frame}
+
+\part{Complexity and Latency}
+
+\setbeamertemplate{background}{
+	\begin{tikzpicture} [overlay, shift={(3, -8)}]
+		\foreach \n in {1, ..., 10}{
+			\draw [opacity=0.7^\n] (0, \n*.6)
+				circle [x radius=.7*\n, y radius=.8*\n];
+		}
+	\end{tikzpicture}
+}
+
+\begin{frame}
+	\centering
+	Part \insertromanpartnumber
+	
+	\color{structure.fg}
+	\insertpart
+\end{frame}
+
+\setbeamertemplate{background}{}
+
+\begin{frame}
+	Complexity: lower is better.
+	But still achieve capacity.
+
+	\pause
+
+	Random code: naively, exponential in $n$.
+
+	\pause
+
+	Standard polar code: $O(n㏒n)$ encoding and decoding per block.
+
+	\pause
+
+	Binary erasure channel: generalizations of repeat--accumulate code
+	can do linear encoder and decoder, i.e., $O(n)$ per block. \\
+	2005 Pfister--Sason--Urbanke.
+	2007 Pfister--Sason. 
+
+	\pause
+
+	General channel?
+\end{frame}
+
+
+\begin{frame}
+	2011 Alamdar-Yazdi--Kschischang:
+	You can prune the family tree.
+
+	\pause
+
+	2017 El-Khamy--Mahdavifar--Feygin--Lee--Kang:
+	If you want the same performance, pruning reduces complexity by a scalar;
+	still $O(n㏒n)$.
+
+	\pause
+
+	2021 W.--Duursma:
+	$O(n㏒㏒n)$ if relax the performance requirement. \\
+	Same gap to capacity;
+
+	\pause
+	
+	Trade-off: complexity $≈ O(n㏒(-㏒(\text{decode error})))$.
+\end{frame}
+
+\begin{frame}
+	\hbox{}\hskip5em
+	\begin{tikzpicture} [y=1.5cm]
+		\path (0, 0) circle(2pt) (0, 4) circle (2pt);
+		\def\depth{8}
+		\def\threshold{8}
+		\def\holdthres{120}
+		\recursivetree{0}{49}
+		\draw [example text.fg] (3, 4-1/4) -- +(\depth - 2.5, 0)
+			node [right] {threshold $1 - θ$};
+		\draw [alerted text.fg] (2, 1/4) -- +(\depth - 1, 0)
+			node [right] {threshold $θ$};
+	\end{tikzpicture}
+\end{frame}
+
+\pgfplotstableread{
+	Code            Error         Gap           Complexity    Channel 
+	random          $\exp(-n^β)$  $n^{-α}$      $\exp(n)$     DMC     
+	concatenation   $\exp(-n^β)$  $→0$          $\poly(n)$    DMC     
+	RM              $→0$          $→0$          $O(n^2)$      BEC     
+	LDPC            $→0$          $→0$          unclear       BMSC    
+	RA~family       $→0$          $→0$          $O(n)$        BEC     
+	MD-polar        $\exp(-n^β)$  $n^{-α}$      $O(n㏒n)$      DMC     
+	log-log-polar   $1/\poly(n)$  $n^{-α}$      $O(n㏒㏒n)$     DMC     
+}\tableComplex
+
+\begin{frame}
+	\centering
+    \def\arraystretch{1.44}
+    \centering\pgfplotstabletypeset[
+        every head row/.style={before row=\toprule,after row=\midrule},
+        every last row/.style={after row=\bottomrule},
+		string type,
+    ]\tableComplex
+\end{frame}
+
+\begin{frame}
+	2021 Mondelli--Hashemi--Cioffi--Goldsmith. \\
+	2021 Hashemi--Mondelli--Fazeli--Vardy--Cioffi--Goldsmith. \\
+	Latency: number of operations that have to wait for each other.
+
+	\pause
+	
+	No parallelism: $O(n㏒㏒n)$ latency.
+
+	\pause
+
+	Allow arbitrary parallelism: $O(n^{1-α})$ latency.
+
+	\pause
+	
+	Proof technique: \\
+	Full-parallel Latency: total number of nodes in the tree. \\
+	Complexity: sum of $2^{\text{total depth}-d} ×{}$
+	number of nodes at depth $d$. \\
+\end{frame}
+
+\part{Network Information Theory}
+
+\setbeamertemplate{background}{
+	\begin{tikzpicture} [overlay, shift={(13, -5)}]
+		\draw [magenta]plot [domain=-4:4, samples=100]
+		({(1 + exp(\x - 3)) * sin(\x*50 + 0)},{\x});
+		\draw [red] plot [domain=-4:4, samples=100]
+		({(1 + exp(\x - 3)) * sin(\x*50 + 60)},{\x});
+		\draw [yellow] plot [domain=-4:4, samples=100]
+		({(1 + exp(\x - 3)) * sin(\x*50 + 120)},{\x});
+		\draw [green] plot [domain=-4:4, samples=100]
+		({(1 + exp(\x - 3)) * sin(\x*50 + 180)},{\x});
+		\draw [cyan] plot [domain=-4:4, samples=100]
+		({(1 + exp(\x - 3)) * sin(\x*50 + 240)},{\x});
+		\draw [blue] plot [domain=-4:4, samples=100]
+		({(1 + exp(\x - 3)) * sin(\x*50 + 300)},{\x});
+	\end{tikzpicture}
+}
+
+\begin{frame}
+	\centering
+	Part \insertromanpartnumber
+	
+	\color{structure.fg}
+	\insertpart
+\end{frame}
+
+\setbeamertemplate{background}{}
+
+\begin{frame}
+	Asymmetric channel ... check
+
+	Noisy channel coding ... check
+
+	Source coding (lossless compression) ... check
+
+	Lossy compression (rate--distortion theory) ... check
+
+	Multiple access channel ... check
+
+	Slepian--Wolf (losslessly compressing two sources) ... check
+
+	Lossless compression problem with a helper ... check
+
+	Wiretap channel (degradation) ... check
+\end{frame}
+
+\begin{frame}
+	Wiretap channel (no degradation) ... LD
+	
+	Broadcast channel ... LD
+
+	Hidden Markov chain input ... LD
+
+	Hidden Markov chain channel state ... LD
+
+	Deletion channel ... LD
+
+	Non-stationary channel ... CLT
+\end{frame}
+
+\part{Todos}
+
+\begin{frame}
+	\centering
+	Part \insertromanpartnumber
+	
+	\color{structure.fg}
+	\insertpart
+\end{frame}
+
+\begin{frame}
+	(In preparation.) \\
+	Binary erasure channel. \\
+	Large matrix over binary alphabet \\
+	versus \\
+	$2 × 2$ matrix over large alphabet?
+	\vskip0ptminus3em
+	\raggedleft
+                                                    default \mupoint{1/3.627} \\
+                                             $8 × 8$ matrix \mupoint{1/3.577} \\
+                                           $16 × 16$ matrix \mupoint{1/3.346} \\
+                                           $24 × 24$ matrix \mupoint{1/3.308} \\
+                                           $4$-ary alphabet \mupoint{1/3.295} \\
+                                           $32 × 32$ matrix \mupoint{1/3.122} \\
+                                           $8$-ary alphabet \mupoint{1/3.053} \\
+                                           $16$-ary alphabet \mupoint{1/2.88} \\
+                                            $64 × 64$ matrix \mupoint{1/2.87} \\
+                                          $32$-ary alphabet \mupoint{1/2.778} \\
+                                          $64$-ary alphabet \mupoint{1/2.699} \\
+                                         $128$-ary alphabet \mupoint{1/2.655} \\
+                                          $256$-ary alphabet \mupoint{1/2.63} \\
+                                         $512$-ary alphabet \mupoint{1/2.596} \\
+\end{frame}
+
+\begin{frame}
+	More directions --- fine measurement.
+
+	True scaling exponent.
+
+	Beta expansion.
+	
+	Coded computation.
+\end{frame}
+
+\begin{frame}
+	More directions --- bald improvement.
+
+	De-randomization.
+
+	De-dynamicity.
+\end{frame}
+
+\part{Epilogue}
+
+\begin{frame}
+	\centering
+	\color{structure.fg}
+	\insertpart
+\end{frame}
+
+\begin{frame}
+	The alien is eventually satisfied with human's answer and leaves.
+
+	Before the alien completely disappears, the last message is:
+	The next presidential election will be held after half of Carbon-14 decays.
+	Make your choice on a golden record and send it to the nearest black hole.
+	The candidates are ...
+
+\end{frame}
+
+\setbeamertemplate{background}{
+	\begin{tikzpicture} [overlay, shift={(8, -5)}]
+		\draw node {\includegraphics[scale=0.8]{Entrance exam.pdf}};
+	\end{tikzpicture}
+}
+
+\begin{frame}
+\end{frame}
+
+\end{document}
